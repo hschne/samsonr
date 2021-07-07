@@ -45,9 +45,8 @@ fn main() ->  Result<(), Box<dyn std::error::Error>> {
 
     let samson_client = samson::Client::new(&token);
     if let Ok(client) = samson_client {
-        if let Ok(projects) = client.projects() {
-            println!("{:?}", projects)
-        }
+        let projects = client.projects();
+        println!("{:?}", projects)
     }
 
 

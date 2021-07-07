@@ -28,7 +28,7 @@ static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_VERSION"),
 );
 
-static base_url : &str= "https://deploy.meisterlabs.com";
+static BASE_URL : &str= "https://deploy.meisterlabs.com";
 
 impl Client {
     pub fn new(token: &String) -> Result<Self, ClientError> {
@@ -39,15 +39,11 @@ impl Client {
         }
     }
 
-    pub fn projects(&self) -> Result<Option<Vec<Project>>, reqwest::Error> {
-        let projects_url = format!("{}/projects.json", base_url);
-        let body = self.client.get(projects_url)
+    pub fn projects(&self) -> Result<HashMap<String, Vec<Project>>, reqwest::Error> {
+        let projects_url = format!("{}/projects.json", BASE_URL);
+        Ok(self.client.get(projects_url)
             .send()?
-            .json::<HashMap<String, Vec<Project>>>()?;
-        match body.get("projects") {
-            Some(projects) => Ok(None),
-            None => Ok(None)
-        }
+            .json::<HashMap<String, Vec<Project>>>()?)
     }
 }
 
