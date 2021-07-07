@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use reqwest::header;
 
+mod samson_client;
 mod configuration;
 
 /// This doc string acts as a help message when the user runs '--help'
@@ -36,48 +37,20 @@ struct Test {
     debug: bool
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-struct Project {
-    id: i32,
-    name: String,
-    last_deployed_at: String,
-    last_deployed_by: String,
-}
-
-static APP_USER_AGENT: &str = concat!(
-    env!("CARGO_PKG_NAME"),
-    "/",
-    env!("CARGO_PKG_VERSION"),
-);
-
 fn main() ->  Result<(), Box<dyn std::error::Error>> {
     let opts: Opts = Opts::parse();
 
     let token = opts.token.unwrap();
     println!("Token {}", token);
 
-    let mut headers = header::HeaderMap::new();
-    let auth_header = &format!("Bearer {}", token)[..];
-    let header_value = header::HeaderValue::from_str(auth_header)?;
-    headers.insert(header::AUTHORIZATION, header_value);
+    let samson_client = samson_client::Client::new(&token);
+    if let Ok(client) = samson_client {
+        if let Ok(projects) = client.projects() {
+            println!("{:?}", projects)
+        }
+    }
 
-    println!("{:#?}", headers);
 
-    let client = reqwest::blocking::Client::builder()
-        .user_agent(APP_USER_AGENT)
-        .default_headers(headers)
-        .build()?;
-    let base_url = "https://deploy.meisterlabs.com";
-    let projects_url = format!("{}/projects.json", base_url);
-    let builds_url = format!("{}/projects/{}/builds.json", base_url, 1);
-    let body = client.get(projects_url)
-        .send()?
-        .text()?;
-
-    println!("{:#?}", body);
-
-    let result: HashMap<String, Vec<Project>> = serde_json::from_str(&body)?;
-    println!("{:#?}", result);
     // Vary the output based on how many times the user used the "verbose" flag
     // (i.e. 'myprog -v -v -v' or 'myprog -vvv' vs 'myprog -v'
     match opts.verbose {
