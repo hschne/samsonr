@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use reqwest::header;
 
-mod samson_client;
+mod samson;
 mod configuration;
 
 /// This doc string acts as a help message when the user runs '--help'
@@ -43,7 +43,7 @@ fn main() ->  Result<(), Box<dyn std::error::Error>> {
     let token = opts.token.unwrap();
     println!("Token {}", token);
 
-    let samson_client = samson_client::Client::new(&token);
+    let samson_client = samson::Client::new(&token);
     if let Ok(client) = samson_client {
         if let Ok(projects) = client.projects() {
             println!("{:?}", projects)
