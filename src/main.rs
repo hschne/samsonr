@@ -41,7 +41,7 @@ struct Test {
 }
 
 
-fn main() ->  Result<(), Box<dyn std::error::Error>> {
+fn main() ->  Result<(), CommandError> {
     let opts: Opts = Opts::parse();
 
     let token = opts.token.unwrap();
@@ -52,7 +52,7 @@ fn main() ->  Result<(), Box<dyn std::error::Error>> {
     match opts.subcmd {
         SubCommand::Projects(command) => { command.run(&samson_client) },
         SubCommand::Stages(command) => { command.run(&samson_client) },
-        SubCommand::Deploy(command) => { command.run(&samson_client) },
+        SubCommand::Deploy(command) => { command.run(&samson_client)? },
     }
     Ok(())
 }
