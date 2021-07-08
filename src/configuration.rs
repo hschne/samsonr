@@ -7,6 +7,7 @@ use config::{ConfigError, Config, File};
 
 #[derive(Debug, Deserialize)]
 pub struct Configuration {
+    pub url: String,
     pub token: Option<String>,
     pub project_id: Option<i32>,
 }

@@ -41,9 +41,9 @@ fn main() ->  Result<(), SamsonrError> {
     let opts: Opts = Opts::parse();
     setup_logger(&opts);
     let token = load_token()?;
-    // println!("Token {:?}", token);
 
-    let samson_client = samson::Client::new(&token)?;  
+    let url = load_base_url()?;
+    let samson_client = samson::Client::new(&token, &url)?;  
 
     match opts.subcmd {
         SubCommand::Projects(command) => { command.run(&samson_client)? },
@@ -92,5 +92,17 @@ fn load_token() -> Result<String, SamsonrError> {
     }
 
     error!("No token found");
+    Err(SamsonrError { message: format!("Missing authorization token") })
+}
+
+fn load_base_url() -> Result<String, SamsonrError> {
+    debug!("Loading base url...");
+    let configuration = configuration::Configuration::new();
+    if let Ok(config) = configuration {
+        debug!("Return url from config, url={}", config.url);
+        return Ok(config.url);
+    }
+
+    error!("No url found");
     Err(SamsonrError { message: format!("Missing authorization token") })
 }

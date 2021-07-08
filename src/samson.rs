@@ -12,6 +12,7 @@ use log::*;
 
 pub struct Client {
     pub token: String,
+    pub url: String,
     client: reqwest::blocking::Client
 }
 
@@ -47,19 +48,18 @@ static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_VERSION"),
 );
 
-static BASE_URL : &str= "https://deploy.meisterlabs.com";
 
 impl Client {
-    pub fn new(token: &String) -> Result<Self, SamsonrError> {
+    pub fn new(token: &String, base_url: &String) -> Result<Self, SamsonrError> {
         let client = build_client(token);
         match client {
-            Ok(client) => Ok(Client { token: token[..].to_string(), client: client }),
+            Ok(client) => Ok(Client { token: token.clone(), url: base_url.clone(), client: client }),
             _ => Err(SamsonrError { message: format!("Failed to build client") })
         }
     }
 
     pub fn projects(&self) -> Result<HashMap<String, Vec<Project>>, SamsonrError> {
-        let projects_url = format!("{}/projects.json", BASE_URL);
+        let projects_url = format!("{}/projects.json", self.url);
         let response = self.client.get(projects_url)
             .send()?;
 
@@ -69,7 +69,7 @@ impl Client {
     }
 
     pub fn stages(&self, project_id: i32) -> Result<HashMap<String, Vec<Stage>>, SamsonrError> {
-        let stages_url = format!("{}/projects/{}/stages.json", BASE_URL, project_id );
+        let stages_url = format!("{}/projects/{}/stages.json", self.url, project_id );
 
         let response = self.client.get(stages_url)
             .send()?;
@@ -79,7 +79,7 @@ impl Client {
     }
 
     pub fn deploy(&self, project_id: i32, stage_id: i32, reference: &String) -> Result<(), SamsonrError> {
-        let deploy_url = format!("{}/projects/{}/stages/{}/deploys.json", BASE_URL, project_id, stage_id );
+        let deploy_url = format!("{}/projects/{}/stages/{}/deploys.json", self.url, project_id, stage_id );
         let mut deploy = HashMap::new();
         deploy.insert("reference", &reference);
         let mut map = HashMap::new();
