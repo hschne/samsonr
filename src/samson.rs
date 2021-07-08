@@ -1,17 +1,15 @@
 use std::collections::HashMap;
 
+use crate::errors::SamsonrError;
+
 use reqwest::blocking::Client as ReqwestClient;
 use reqwest::header::{self};
 use serde::{Deserialize, Serialize};
 
+
 pub struct Client {
     pub token: String,
     client: reqwest::blocking::Client
-}
-
-#[derive(Debug)]
-pub struct ClientError {
-    message: &'static str,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -37,11 +35,11 @@ static APP_USER_AGENT: &str = concat!(
 static BASE_URL : &str= "https://deploy.meisterlabs.com";
 
 impl Client {
-    pub fn new(token: &String) -> Result<Self, ClientError> {
+    pub fn new(token: &String) -> Result<Self, SamsonrError> {
         let client = build_client(token);
         match client {
             Ok(client) => Ok(Client { token: token[..].to_string(), client: client }),
-            _ => Err(ClientError { message: "Failed to build client" })
+            _ => Err(SamsonrError { message: format!("Failed to build client") })
         }
     }
 
@@ -65,7 +63,7 @@ impl Client {
         deploy.insert("reference", &reference);
         let mut map = HashMap::new();
         map.insert("deploy", deploy);
-        let result = self.client.post(deploy_url)
+        self.client.post(deploy_url)
             .json(&map)
             .send()?
             .text()?;

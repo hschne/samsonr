@@ -1,20 +1,20 @@
 use clap::{AppSettings, Clap};
+use anyhow::{Context, Result };
 
 mod samson;
 mod commands;
+mod errors;
 mod configuration;
 
 use commands::*;
+use errors::SamsonrError;
 
 /// This doc string acts as a help message when the user runs '--help'
 /// as do all doc strings on fields
-#[derive(Clap)]
+#[derive(Clap, Debug)]
 #[clap(version = "1.0", author = "Hans Schnedlitz <hans.schnedlitz@gmail.com>")]
 #[clap(setting = AppSettings::ColoredHelp)]
-struct Opts {
-    /// Sets a custom config file. Could have been an Option<T> with no default too
-    #[clap(short, long)]
-    config: Option<String>,
+pub struct Opts {
     #[clap(short, long)]
     token: Option<String>,
     /// Some input. Because this isn't an Option<T> it's required to be used
@@ -26,33 +26,41 @@ struct Opts {
 }
 
 
-#[derive(Clap)]
+#[derive(Clap, Debug)]
 enum SubCommand {
     Projects(ProjectsCommand),
     Stages(StagesCommand),
     Deploy(DeployCommand),
 }
 
-#[derive(Clap)]
-struct Test {
-    /// Print debug info
-    #[clap(short)]
-    debug: bool
-}
-
-
-fn main() ->  Result<(), CommandError> {
+fn main() ->  Result<(), SamsonrError> {
     let opts: Opts = Opts::parse();
 
-    let token = opts.token.unwrap();
-    println!("Token {}", token);
+    let token = load_token()?;
+    // println!("Token {:?}", token);
 
-    let samson_client = samson::Client::new(&token).expect("Failed to create client");
+    let samson_client = samson::Client::new(&token)?;  
 
     match opts.subcmd {
         SubCommand::Projects(command) => { command.run(&samson_client) },
-        SubCommand::Stages(command) => { command.run(&samson_client) },
+        SubCommand::Stages(command) => { command.run(&samson_client)? },
         SubCommand::Deploy(command) => { command.run(&samson_client)? },
     }
     Ok(())
+}
+
+fn load_token() -> Result<String, SamsonrError> {
+    let configuration = configuration::Configuration::new();
+    if let Ok(config) = configuration {
+        if let Some(token) = config.token {
+            return Ok(token.clone());
+        }
+    }
+    
+    let opts: Opts = Opts::parse();
+    if let Some(token) = opts.token {
+        return Ok(token.clone())
+    }
+
+    Err(SamsonrError { message: format!("Missing authorization token") })
 }
