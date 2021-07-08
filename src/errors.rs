@@ -17,3 +17,9 @@ impl Error for SamsonrError {
         Some(self)
     }
 }
+
+impl From<reqwest::Error> for SamsonrError {
+    fn from(error: reqwest::Error) -> Self {
+        SamsonrError { message: format!("Reqwest error, error={}", error) }
+    }
+}
