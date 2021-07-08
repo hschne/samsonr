@@ -13,18 +13,18 @@ mod configuration;
 use commands::*;
 use errors::SamsonrError;
 
-/// This doc string acts as a help message when the user runs '--help'
-/// as do all doc strings on fields
+/// SamsonR is a simple command line client for Samson
 #[derive(Clap, Debug)]
 #[clap(version = "1.0", author = "Hans Schnedlitz <hans.schnedlitz@gmail.com>")]
 #[clap(setting = AppSettings::ColoredHelp)]
 pub struct Opts {
+    /// Your authorization token
     #[clap(short, long)]
     token: Option<String>,
-    /// Some input. Because this isn't an Option<T> it's required to be used
-    /// A level of verbosity, and can be used multiple times
+    /// Verbosity, repeat this to increate the log level
     #[clap(short, long, parse(from_occurrences))]
     verbose: i32,
+    /// Subcommands to interact with the server
     #[clap(subcommand)]
     subcmd: SubCommand,
 }
