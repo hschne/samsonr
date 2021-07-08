@@ -1,7 +1,5 @@
 <div align="center">
 
-![Logo](public/logo-192.png)
-
 # SamsonR
 
 A simple command line client for [Samson](https://github.com/zendesk/samson), written in Rust.
@@ -10,7 +8,7 @@ A simple command line client for [Samson](https://github.com/zendesk/samson), wr
 [![Probably works](https://shields.io/badge/Probably-works-f6a34d?style=flat)]()
 [![License MIT](https://shields.io/badge/License-MIT-e0dd52?style=flat)](#license)
 
-[Key Features](#key-features) · [Installation](#installation) · [How to Use](#how-to-use) · [Contributing](#contributing) · [License](#license)
+[Installation](#installation) · [How to Use](#how-to-use) · [Contributing](#contributing) · [License](#license)
 
 </div>
 
@@ -19,7 +17,7 @@ A simple command line client for [Samson](https://github.com/zendesk/samson), wr
 Clone this repository, and run:
 
 ```shell
-# Clone the repository
+# Clone the repository, then
 $ cargo run
 ```
 
