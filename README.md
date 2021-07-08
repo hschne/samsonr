@@ -5,7 +5,7 @@
 A simple command line client for [Samson](https://github.com/zendesk/samson), written in Rust.
 
 [![Made with Rust](https://shields.io/badge/Made_with-Rust-f05869?style=flat)](https://www.rust-lang.org/)
-[![Probably works](https://shields.io/badge/Probably-works-f6a34d?style=flat)]()
+[![Probably works](https://shields.io/badge/Probably-works-f6a34d?style=flat)](https://github.com/hschne/samsonr/)
 [![License MIT](https://shields.io/badge/License-MIT-e0dd52?style=flat)](#license)
 
 [Installation](#installation) · [How to Use](#how-to-use) · [Contributing](#contributing) · [License](#license)
